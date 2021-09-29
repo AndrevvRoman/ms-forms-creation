@@ -19,36 +19,95 @@ class FieldsController extends AbstractController
      * @Route("/fields", name="fields")
      * @return JsonResponse
      */
-    public function index(): Response
+    public function fields(): Response
     {
         $em = $this->getDoctrine()->getManager();
         $fields = $em->getRepository(Field::class)->findAll();
         $normalizeService = new NormalizeService();
         return $normalizeService->normalizeFields($fields);
     }
+
     /**
      * @Route("/fields/add", name="fields_add")
-     * @return JsonResponse
+     * @return HttpResponse
      */
     public function fields_add(Request $request): Response
     {
-        $isReqire = $request->query->get('isRequire');
-        $title = $request->query->get('title');
-        $placeHolder = $request->query->get('placeHolder');
-        $inputType = $request->query->get('inputType');
-        $responseType = $request->query->get('responseType');
+        if (!$request->isMethod('post'))
+        {
+            return new Response(Response::HTTP_FORBIDDEN);
+        }
+        $isReqire = $request->request->get('isRequire');
+        $title = $request->request->get('title');
+        $placeHolder = $request->request->get('placeHolder');
+        $inputType = $request->request->get('inputType');
+        $responseType = $request->request->get('responseType');
+        $parentId = $request->request->get('idForm');
+
         $newField = new Field();
-        $newField->setIsRequire($isReqire);
-        $newField->setTitle($title);
-        $newField->setPlaceHolder($placeHolder);
-        $newField->setInputType($inputType);
-        $newField->setResponseType($responseType);
+        $newField->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType)->setResponseType($responseType);
         $manager = $this->getDoctrine()->getManager();
-        $parentForm = $manager->getRepository(Form::class)->find($request->query->get('idForm'));
+        $parentForm = $manager->getRepository(Form::class)->find($parentId);
         $newField->setIdFormFK($parentForm);
 
         $manager->persist($newField);
         $manager->flush();
+
+        return new Response(Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/fields/remove", name="fields_remove")
+     * @return HttpResponse
+     */
+    public function remove_field(Request $request): Response
+    {
+        if (!$request->isMethod('post'))
+        {
+            return new Response(Response::HTTP_FORBIDDEN);
+        }
+        $id = $request->request->get('id');
+        $manager = $this->getDoctrine()->getManager();
+        $field = $manager->getRepository(Field::class)->find($id);
+        if ($field == null)
+        {
+            return new Response(Response::HTTP_NOT_FOUND);    
+        }
+        $manager->remove($field);
+        $manager->flush();
+        return new Response(Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/fields/update", name="fields_update")
+     * @return HttpResponse
+     */
+    public function update_field(Request $request): Response
+    {
+        if (!$request->isMethod('post'))
+        {
+            return new Response(Response::HTTP_FORBIDDEN);
+        }
+        $id = $request->request->get('id');
+        $manager = $this->getDoctrine()->getManager();
+        $field = $manager->getRepository(Field::class)->find($id);
+        if ($field == null)
+        {
+            return new Response(Response::HTTP_NOT_FOUND);    
+        }
+        $isReqire = $request->request->get('isRequire');
+        $title = $request->request->get('title');
+        $placeHolder = $request->request->get('placeHolder');
+        $inputType = $request->request->get('inputType');
+        $responseType = $request->request->get('responseType');
+        $parentId = $request->request->get('idForm');
+        $manager = $this->getDoctrine()->getManager();
+        $parentForm = $manager->getRepository(Form::class)->find($parentId);
+        
+        $field->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType)->setResponseType($responseType);
+        $field->setIdFormFK($parentForm);
+        $manager->flush();
+
         return new Response(Response::HTTP_OK);
     }
 }
