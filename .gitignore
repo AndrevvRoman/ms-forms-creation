@@ -5,3 +5,4 @@
 /docker/.env
 .DS_Store
 logs
+mysql
