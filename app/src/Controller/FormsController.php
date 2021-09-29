@@ -17,7 +17,7 @@ class FormsController extends AbstractController
      * @Route("/forms", name="forms")
      * @return JsonResponse
      */
-    public function index(): Response
+    public function forms(): Response
     {
         $em = $this->getDoctrine()->getManager();
         $forms = $em->getRepository(Form::class)->findAll();
@@ -31,9 +31,13 @@ class FormsController extends AbstractController
      */
     public function add_forms(Request $request): Response
     {
-        $name = $request->query->get('name');
-        $title = $request->query->get('title');
-        $userId = $request->query->get('userId');
+        if (!$request->isMethod('post'))
+        {
+            return new Response(Response::HTTP_FORBIDDEN);
+        }
+        $name = $request->request->get('name');
+        $title = $request->request->get('title');
+        $userId = $request->request->get('userId');
         $newForm = new Form();
         $newForm->setName($name);
         $newForm->setTitle($title);
@@ -49,7 +53,11 @@ class FormsController extends AbstractController
      */
     public function remove_from(Request $request): Response
     {
-        $id = $request->query->get('id');
+        if (!$request->isMethod('post'))
+        {
+            return new Response(Response::HTTP_FORBIDDEN);
+        }
+        $id = $request->request->get('id');
         $manager = $this->getDoctrine()->getManager();
         $form = $manager->getRepository(Form::class)->find($id);
         if ($form == null)
@@ -66,16 +74,20 @@ class FormsController extends AbstractController
      */
     public function update_from(Request $request): Response
     {
-        $id = $request->query->get('id');
+        if (!$request->isMethod('post'))
+        {
+            return new Response(Response::HTTP_FORBIDDEN);
+        }
+        $id = $request->request->get('id');
         $manager = $this->getDoctrine()->getManager();
         $form = $manager->getRepository(Form::class)->find($id);
         if ($form == null)
         {
             return new Response(Response::HTTP_NOT_FOUND);    
         }
-        $name = $request->query->get('name');
-        $title = $request->query->get('title');
-        $userId = $request->query->get('userId');
+        $name = $request->request->get('name');
+        $title = $request->request->get('title');
+        $userId = $request->request->get('userId');
         $form->setName($name)->setTitle($title)->setUserId($userId);
         $manager->flush();
         return new Response(Response::HTTP_OK);
