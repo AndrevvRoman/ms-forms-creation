@@ -43,4 +43,41 @@ class FormsController extends AbstractController
         $manager->flush();
         return new Response(Response::HTTP_OK);
     }
+    /**
+     * @Route("/forms/remove", name="forms_remove")
+     * @return HttpResponse
+     */
+    public function remove_from(Request $request): Response
+    {
+        $id = $request->query->get('id');
+        $manager = $this->getDoctrine()->getManager();
+        $form = $manager->getRepository(Form::class)->find($id);
+        if ($form == null)
+        {
+            return new Response(Response::HTTP_NOT_FOUND);    
+        }
+        $manager->remove($form);
+        $manager->flush();
+        return new Response(Response::HTTP_OK);
+    }
+    /**
+     * @Route("/forms/update", name="forms_update")
+     * @return HttpResponse
+     */
+    public function update_from(Request $request): Response
+    {
+        $id = $request->query->get('id');
+        $manager = $this->getDoctrine()->getManager();
+        $form = $manager->getRepository(Form::class)->find($id);
+        if ($form == null)
+        {
+            return new Response(Response::HTTP_NOT_FOUND);    
+        }
+        $name = $request->query->get('name');
+        $title = $request->query->get('title');
+        $userId = $request->query->get('userId');
+        $form->setName($name)->setTitle($title)->setUserId($userId);
+        $manager->flush();
+        return new Response(Response::HTTP_OK);
+    }
 }
