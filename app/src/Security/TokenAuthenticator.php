@@ -9,83 +9,71 @@
 namespace App\Security;
 
 use Monolog\Logger;
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use App\Entity\User;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-class TokenAuthenticator extends AbstractGuardAuthenticator
+class TokenAuthenticator extends AbstractAuthenticator
 {
     /**
      * Called on every request to decide if this authenticator should be
      * used for the request. Returning false will cause this authenticator
      * to be skipped.
      */
-    public function supports(Request $request)
+    public function supports(Request $request) : bool
     {
         return $request->headers->has('YT-AUTH-TOKEN');
     }
 
-    /**
-     * Called on every request. Return whatever credentials you want to
-     * be passed to getUser() as $credentials.
-     */
-    public function getCredentials(Request $request)
+
+    public function authenticate(Request $request): PassportInterface
     {
-        return array(
-            'token' => $request->headers->get('YT-AUTH-TOKEN'),
+        $token = $request->headers->get('YT-AUTH-TOKEN');
+        if (null === $token) {
+            // The token header was empty, authentication fails with HTTP Status
+            // Code 401 "Unauthorized"
+            throw new CustomUserMessageAuthenticationException('API token is required');
+        }
+        return new SelfValidatingPassport(
+            new UserBadge($token, function ($apiKey) {
+                $url = $_ENV['APP_ENV'] === 'prod' ? 'nginx_user_cp' : 'https://back.yourtar.ru';
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url . "/api/user/");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'YT-AUTH-TOKEN: ' . $apiKey,
+                ));
+                $data = json_decode(curl_exec($ch));
+                curl_close($ch);
+
+                if (!isset($data->user)) {
+                    throw new UserNotFoundException('Invalid credentials');
+                }
+
+                $user = new User($data->user->id, $data->user->email, $data->user->roles);
+
+                return $user;
+            })
         );
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
-    {
-        $apiKey = $credentials['token'];
-
-        if (null === $apiKey) {
-            return;
-        }
-
-        $url = $_ENV['APP_ENV'] === 'prod' ? 'nginx_user' : 'https://back.yourtar.ru';
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url . "/api/user/");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'YT-AUTH-TOKEN: ' . $apiKey,
-        ));
-        $data = json_decode(curl_exec($ch));
-        curl_close($ch);
-
-        if (!isset($data->user)) {
-            return;
-        }
-
-        $user = new User($data->user->id, $data->user->email, $data->user->roles);
-
-        return $user;
-    }
-
-    public function checkCredentials($credentials, UserInterface $user)
-    {
-        // check credentials - e.g. make sure the password is valid
-        // no credential check is needed in this case
-
-        // return true to cause authentication success
-        return true;
-    }
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $firewallName) : ?Response
     {
         // on success, let the request continue
         return null;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception) : Response
     {
         $data = array(
             'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
@@ -97,21 +85,4 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         return new JsonResponse($data, Response::HTTP_FORBIDDEN);
     }
 
-    /**
-     * Called when authentication is needed, but it's not sent
-     */
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
-        $data = array(
-            // you might translate this message
-            'message' => 'Authentication Required'
-        );
-
-        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
-    }
-
-    public function supportsRememberMe()
-    {
-        return false;
-    }
 }
