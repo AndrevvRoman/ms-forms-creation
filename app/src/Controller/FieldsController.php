@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-
-
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,6 +16,7 @@ class FieldsController extends AbstractController
 {
     /**
      * @Route("/fields", name="fields")
+     * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
     public function fields(): Response
@@ -29,6 +29,7 @@ class FieldsController extends AbstractController
 
     /**
      * @Route("/fields/add", name="fields_add")
+     * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function fields_add(Request $request): Response
@@ -58,6 +59,7 @@ class FieldsController extends AbstractController
 
     /**
      * @Route("/fields/remove", name="fields_remove")
+     * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function remove_field(Request $request): Response
@@ -80,6 +82,7 @@ class FieldsController extends AbstractController
 
     /**
      * @Route("/fields/update", name="fields_update")
+     * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function update_field(Request $request): Response

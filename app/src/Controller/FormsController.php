@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Form;
@@ -15,6 +16,7 @@ class FormsController extends AbstractController
 {
     /**
      * @Route("/forms", name="forms")
+     * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
     public function forms(): Response
@@ -27,6 +29,7 @@ class FormsController extends AbstractController
 
     /**
      * @Route("/forms/add", name="forms_add")
+     * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function add_forms(Request $request): Response
@@ -49,6 +52,7 @@ class FormsController extends AbstractController
     }
     /**
      * @Route("/forms/remove", name="forms_remove")
+     * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function remove_from(Request $request): Response
@@ -70,6 +74,7 @@ class FormsController extends AbstractController
     }
     /**
      * @Route("/forms/update", name="forms_update")
+     * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function update_from(Request $request): Response
