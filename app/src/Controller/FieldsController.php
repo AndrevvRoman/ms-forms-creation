@@ -8,14 +8,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception;
 use App\Service\NormalizeService;
 use App\Entity\Field;
 use App\Entity\Form;
+use Exception as GlobalException;
+use Psr\Log\LoggerInterface;
 
 class FieldsController extends AbstractController
 {
     /**
-     * @Route("/fields", name="fields")
+     * @Route("/fields", name="fields", methods={"GET"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -28,16 +31,12 @@ class FieldsController extends AbstractController
     }
 
     /**
-     * @Route("/fields/add", name="fields_add")
+     * @Route("/fields/add", name="fields_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function fields_add(Request $request): Response
     {
-        if (!$request->isMethod('post'))
-        {
-            return new Response(Response::HTTP_FORBIDDEN);
-        }
         $isReqire = $request->request->get('isRequire');
         $title = $request->request->get('title');
         $placeHolder = $request->request->get('placeHolder');
@@ -58,17 +57,14 @@ class FieldsController extends AbstractController
     }
 
     /**
-     * @Route("/fields/remove", name="fields_remove")
+     * @Route("/fields/remove", name="fields_remove", methods={"DELETE"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
-    public function remove_field(Request $request): Response
+    public function remove_field(Request $request,LoggerInterface $logger): Response
     {
-        if (!$request->isMethod('post'))
-        {
-            return new Response(Response::HTTP_FORBIDDEN);
-        }
-        $id = $request->request->get('id');
+        $data = json_decode($request->getContent(), true);
+        $id = $data["id"];
         $manager = $this->getDoctrine()->getManager();
         $field = $manager->getRepository(Field::class)->find($id);
         if ($field == null)
@@ -81,29 +77,27 @@ class FieldsController extends AbstractController
     }
 
     /**
-     * @Route("/fields/update", name="fields_update")
+     * @Route("/fields/update", name="fields_update", methods={"PATCH"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function update_field(Request $request): Response
     {
-        if (!$request->isMethod('post'))
-        {
-            return new Response(Response::HTTP_FORBIDDEN);
-        }
-        $id = $request->request->get('id');
+        $data = json_decode($request->getContent(), true);
+        $id = $data["id"];
         $manager = $this->getDoctrine()->getManager();
         $field = $manager->getRepository(Field::class)->find($id);
         if ($field == null)
         {
             return new Response(Response::HTTP_NOT_FOUND);    
         }
-        $isReqire = $request->request->get('isRequire');
-        $title = $request->request->get('title');
-        $placeHolder = $request->request->get('placeHolder');
-        $inputType = $request->request->get('inputType');
-        $responseType = $request->request->get('responseType');
-        $parentId = $request->request->get('idForm');
+        
+        $isReqire = $data['isRequire'];
+        $title = $data['title'];
+        $placeHolder = $data['placeHolder'];
+        $inputType = $data['inputType'];
+        $responseType = $data['responseType'];
+        $parentId = $data['idForm'];
         $manager = $this->getDoctrine()->getManager();
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
         
@@ -111,6 +105,7 @@ class FieldsController extends AbstractController
         $field->setIdFormFK($parentForm);
         $manager->flush();
 
-        return new Response(Response::HTTP_OK);
+        $normalizeService = new NormalizeService();
+        return $normalizeService->normalizeFields([$field]);
     }
 }
