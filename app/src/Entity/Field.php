@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\FieldRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Proxies\__CG__\App\Entity\InputType;
 
 /**
@@ -75,6 +76,7 @@ class Field
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"main"})
      */
     private $id;
 
@@ -85,11 +87,13 @@ class Field
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"main"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"main"})
      */
     private $placeHolder;
 
@@ -101,11 +105,13 @@ class Field
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"main"})
      */
     private $inputType;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"main"})
      */
     private $responseType;
 

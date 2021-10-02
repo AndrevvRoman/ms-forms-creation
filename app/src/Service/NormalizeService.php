@@ -1,11 +1,6 @@
 <?php
-
 namespace App\Service;
 
-use app\Entity\Field;
-use app\Entity\ResponseType;
-use app\Entity\InputType;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -15,55 +10,24 @@ use Symfony\Component\Serializer\Serializer;
 
 class NormalizeService
 {
+    private $datetimeFormat;
+
     public function __construct()
     {
+        $this->datetimeFormat = function ($innerObject, $outerObject, string $attributeName, string $format = null, array $context = []) {
+            return $innerObject instanceof \DateTime ? $innerObject->format(\DateTime::ISO8601) : '';
+        };
     }
 
-    public function normalizeForms($forms)
-    {
-        $formsCollection = array();
-        foreach ($forms as $form) 
-        {
-            $fields = $form->getFields();
-            $fieldsCollection = array();
-            foreach ($fields as $field) 
-            {
-                $fieldsCollection[] = array(
-                    'id' => $field->getId(),
-                    'isRequire' => $field->getIsRequire(),
-                    'title' => $field->getTitle(),
-                    'placeHolder' => $field->getPlaceHolder(),
-                    'inputType' => $field->getInputType(),
-                    'responseType' => $field->getResponseType(),
-                    'idForm' => $field->getIdFormFK()->getId(),
-                );
-            }
-            
-            $formsCollection[] = array(
-                'id' => $form->getId(),
-                'name' => $form->getName(),
-                'title' => $form->getTitle(),
-                'userId' => $form->getUserId(),
-                'fields' => $fieldsCollection,
-            );
-        }
-        return new JsonResponse($formsCollection);
-    }
+    public function normalizeByGroup($object, $groups = ['groups' => 'main']) {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory)]);
 
-    public function normalizeFields($fields)
-    {
-        $arrayCollection = array();
-        foreach ($fields as $field) {
-            $arrayCollection[] = array(
-                'id' => $field->getId(),
-                'isRequire' => $field->getIsRequire(),
-                'title' => $field->getTitle(),
-                'placeHolder' => $field->getPlaceHolder(),
-                'inputType' => $field->getInputType(),
-                'responseType' => $field->getResponseType(),
-                'idForm' => $field->getIdFormFK()->getId(),
-            );
-        }
-        return new JsonResponse($arrayCollection);
+        return $serializer->normalize($object, null, [
+            'groups' => $groups['groups'],
+            AbstractNormalizer::CALLBACKS => [
+                'moment' => $this->datetimeFormat,
+            ],
+        ]);
     }
 }

@@ -23,8 +23,9 @@ class FormsController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $forms = $em->getRepository(Form::class)->findAll();
-        $normalizeService = new NormalizeService();
-        return $normalizeService->normalizeForms($forms);
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($forms)
+        ]);
     }
 
     /**

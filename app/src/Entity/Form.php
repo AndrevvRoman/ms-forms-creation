@@ -6,6 +6,7 @@ use App\Repository\FormRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=FormRepository::class)
@@ -19,21 +20,25 @@ class Form
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"main"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"main"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"main"})
      */
     private $title;
 
     /**
      * @ORM\OneToMany(targetEntity=Field::class, mappedBy="idFormFK", orphanRemoval=true)
+     * @Groups({"main"})
      */
     private $fields;
 

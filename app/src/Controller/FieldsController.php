@@ -26,8 +26,9 @@ class FieldsController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $fields = $em->getRepository(Field::class)->findAll();
-        $normalizeService = new NormalizeService();
-        return $normalizeService->normalizeFields($fields);
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($fields)
+        ]);
     }
 
     /**
@@ -105,7 +106,8 @@ class FieldsController extends AbstractController
         $field->setIdFormFK($parentForm);
         $manager->flush();
 
-        $normalizeService = new NormalizeService();
-        return $normalizeService->normalizeFields([$field]);
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($field)
+        ]);
     }
 }
