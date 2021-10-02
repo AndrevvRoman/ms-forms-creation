@@ -15,7 +15,7 @@ use App\Service\NormalizeService;
 class FormsController extends AbstractController
 {
     /**
-     * @Route("/forms", name="forms")
+     * @Route("/forms", name="forms", methods={"GET"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -29,73 +29,84 @@ class FormsController extends AbstractController
     }
 
     /**
-     * @Route("/forms/add", name="forms_add")
+     * @Route("/forms/add", name="forms_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function add_forms(Request $request): Response
     {
-        if (!$request->isMethod('post'))
-        {
-            return new Response(Response::HTTP_FORBIDDEN);
-        }
         $name = $request->request->get('name');
         $title = $request->request->get('title');
         $userId = $request->request->get('userId');
+
         $newForm = new Form();
-        $newForm->setName($name);
-        $newForm->setTitle($title);
-        $newForm->setUserId($userId);
+        $newForm->setName($name)->setTitle($title)->setUserId($userId);
+
         $manager = $this->getDoctrine()->getManager();
         $manager->persist($newForm);
         $manager->flush();
-        return new Response(Response::HTTP_OK);
+
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
+            'message' => 'Form created'
+        ]);
     }
     /**
-     * @Route("/forms/remove", name="forms_remove")
+     * @Route("/forms/remove", name="forms_remove", methods={"DELETE"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function remove_from(Request $request): Response
     {
-        if (!$request->isMethod('post'))
-        {
-            return new Response(Response::HTTP_FORBIDDEN);
-        }
-        $id = $request->request->get('id');
+        $data = json_decode($request->getContent(), true);
+        $id = $data['id'];
+
         $manager = $this->getDoctrine()->getManager();
         $form = $manager->getRepository(Form::class)->find($id);
         if ($form == null)
         {
-            return new Response(Response::HTTP_NOT_FOUND);    
+            return $this->json([
+                'message' => 'Form not found'
+            ]);
         }
+
         $manager->remove($form);
         $manager->flush();
-        return new Response(Response::HTTP_OK);
+
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'message' => 'Form deleted'
+        ]);
     }
     /**
-     * @Route("/forms/update", name="forms_update")
+     * @Route("/forms/update", name="forms_update", methods={"PATCH"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
     public function update_from(Request $request): Response
     {
-        if (!$request->isMethod('post'))
-        {
-            return new Response(Response::HTTP_FORBIDDEN);
-        }
-        $id = $request->request->get('id');
+        $data = json_decode($request->getContent(), true);
+        $id = $data['id'];
+
         $manager = $this->getDoctrine()->getManager();
         $form = $manager->getRepository(Form::class)->find($id);
         if ($form == null)
         {
-            return new Response(Response::HTTP_NOT_FOUND);    
+            return $this->json([
+                'message' => 'Form not found'
+            ]);  
         }
-        $name = $request->request->get('name');
-        $title = $request->request->get('title');
-        $userId = $request->request->get('userId');
+
+        $name = $data['name'];
+        $title = $data['title'];
+        $userId = $data['userId'];
+
         $form->setName($name)->setTitle($title)->setUserId($userId);
         $manager->flush();
-        return new Response(Response::HTTP_OK);
+        
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'message' => 'Form updated'
+        ]);
     }
 }

@@ -8,11 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception;
 use App\Service\NormalizeService;
 use App\Entity\Field;
 use App\Entity\Form;
-use Exception as GlobalException;
 use Psr\Log\LoggerInterface;
 
 class FieldsController extends AbstractController
@@ -46,15 +44,20 @@ class FieldsController extends AbstractController
         $parentId = $request->request->get('idForm');
 
         $newField = new Field();
-        $newField->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType)->setResponseType($responseType);
+        $newField->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder);
+        $newField->setInputType($inputType)->setResponseType($responseType);
         $manager = $this->getDoctrine()->getManager();
+
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
         $newField->setIdFormFK($parentForm);
 
         $manager->persist($newField);
         $manager->flush();
 
-        return new Response(Response::HTTP_OK);
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($newField),
+            'message' => 'Field created'
+        ]);
     }
 
     /**
@@ -65,16 +68,24 @@ class FieldsController extends AbstractController
     public function remove_field(Request $request,LoggerInterface $logger): Response
     {
         $data = json_decode($request->getContent(), true);
-        $id = $data["id"];
+        $id = $data['id'];
+
         $manager = $this->getDoctrine()->getManager();
         $field = $manager->getRepository(Field::class)->find($id);
         if ($field == null)
         {
-            return new Response(Response::HTTP_NOT_FOUND);    
+            return $this->json([
+                'message' => 'Field not found'
+            ]);    
         }
+
         $manager->remove($field);
         $manager->flush();
-        return new Response(Response::HTTP_OK);
+
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'message' => 'Field deleted'
+        ]);
     }
 
     /**
@@ -85,7 +96,8 @@ class FieldsController extends AbstractController
     public function update_field(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
-        $id = $data["id"];
+        $id = $data['id'];
+        
         $manager = $this->getDoctrine()->getManager();
         $field = $manager->getRepository(Field::class)->find($id);
         if ($field == null)
@@ -107,7 +119,8 @@ class FieldsController extends AbstractController
         $manager->flush();
 
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($field)
+            'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'message' => 'Field updated'
         ]);
     }
 }
