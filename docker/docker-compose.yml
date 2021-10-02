@@ -21,7 +21,7 @@ services:
     ports: 
       - '9000:9000'
     volumes: 
-      - ./app:/var/www/php_forms_creation
+      - ../app:/var/www/php_forms_creation
     depends_on: 
       - mysql_forms_creation
   nginx_froms_creation:
@@ -30,7 +30,7 @@ services:
     ports: 
       - '8080:80'
     volumes: 
-      - ./app:/var/www/php_forms_creation
+      - ../app:/var/www/php_forms_creation
       - ./logs/nginx:/var/log/nginx
       - ./ngnix/default.conf:/etc/nginx/conf.d/default.conf
     depends_on: 
