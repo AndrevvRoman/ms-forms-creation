@@ -16,12 +16,8 @@ class Field
     private const INPUT_TYPE_BUTTON = "button";
     private const INPUT_TYPE_CHECKBOX = "checkbox";
     private const INPUT_TYPE_FILE = "file";
-    private const INPUT_TYPE_HIDDEN = "hidden";
     private const INPUT_TYPE_IMAGE = "image";
-    private const INPUT_TYPE_PASSWORD = "password";
     private const INPUT_TYPE_RADIO = "radio";
-    private const INPUT_TYPE_RESET = "reset";
-    private const INPUT_TYPE_SUBMIT = "submit";
     private const INPUT_TYPE_TEXT = "text";
 
     //since HTML 5
@@ -29,13 +25,11 @@ class Field
     private const INPUT_TYPE_DATE = "date";
     private const INPUT_TYPE_TIME = "time";
     private const INPUT_TYPE_DATETIME = "datetime";
-    private const INPUT_TYPE_DATETIME_LOCAL = "datetime-local";
     private const INPUT_TYPE_MOUTH = "month";
     private const INPUT_TYPE_WEEK = "week";
     private const INPUT_TYPE_EMAIL = "email";
     private const INPUT_TYPE_NUMBER = "number";
     private const INPUT_TYPE_RANGE = "range";
-    private const INPUT_TYPE_SEARCH = "search";
     private const INPUT_TYPE_TEL = "tel";
     private const INPUT_TYPE_URL = "url";
 
@@ -44,33 +38,45 @@ class Field
         Field::INPUT_TYPE_BUTTON ,
         Field::INPUT_TYPE_CHECKBOX ,
         Field::INPUT_TYPE_FILE ,
-        Field::INPUT_TYPE_HIDDEN ,
         Field::INPUT_TYPE_IMAGE ,
-        Field::INPUT_TYPE_PASSWORD ,
         Field::INPUT_TYPE_RADIO ,
-        Field::INPUT_TYPE_RESET ,
-        Field::INPUT_TYPE_SUBMIT ,
         Field::INPUT_TYPE_TEXT ,
         
         Field::INPUT_TYPE_COLOR ,
         Field::INPUT_TYPE_DATE ,
         Field::INPUT_TYPE_TIME ,
         Field::INPUT_TYPE_DATETIME ,
-        Field::INPUT_TYPE_DATETIME_LOCAL ,
         Field::INPUT_TYPE_MOUTH ,
         Field::INPUT_TYPE_WEEK ,
         Field::INPUT_TYPE_EMAIL ,
         Field::INPUT_TYPE_NUMBER ,
         Field::INPUT_TYPE_RANGE ,
-        Field::INPUT_TYPE_SEARCH ,
         Field::INPUT_TYPE_TEL ,
         Field::INPUT_TYPE_URL ,        
     );
 
     private const RESPONSE_TYPE_DEFAULT = "default";
-    
+    private const RESPONSE_TYPE_INTEGER = "integer";
+    private const RESPONSE_TYPE_BOOL = "bool";
+    private const RESPONSE_TYPE_FLOAT = "float";
+    private const RESPONSE_TYPE_STRING = "string";
+    private const RESPONSE_TYPE_DATE = "date";
+    private const RESPONSE_TYPE_TIME = "time";
+    private const RESPONSE_TYPE_DATETIME = "datetime";
+    private const RESPONSE_TYPE_COLOR = "color";
+    private const RESPONSE_TYPE_FILE = "file";
+
     const responseTypes = array(
-        Field::RESPONSE_TYPE_DEFAULT
+        Field::RESPONSE_TYPE_DEFAULT,
+        Field::RESPONSE_TYPE_INTEGER,
+        Field::RESPONSE_TYPE_BOOL,
+        Field::RESPONSE_TYPE_FLOAT,
+        Field::RESPONSE_TYPE_STRING,
+        Field::RESPONSE_TYPE_DATE,
+        Field::RESPONSE_TYPE_TIME,
+        Field::RESPONSE_TYPE_DATETIME,
+        Field::RESPONSE_TYPE_COLOR,
+        Field::RESPONSE_TYPE_FILE,
     );
     /**
      * @ORM\Id
