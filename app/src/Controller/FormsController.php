@@ -29,6 +29,22 @@ class FormsController extends AbstractController
     }
 
     /**
+     * @Route("/forms", name="forms", methods={"GET"})
+     * @Security("is_granted('ROLE_USER')")
+     * @return JsonResponse
+     */
+    public function form(Request $request): Response
+    {
+        $id = $request->query->get('id');
+        $em = $this->getDoctrine()->getManager();
+        $form = $em->getRepository(Form::class)->find($id);
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'message' => 'Form founded'
+        ]);
+    }
+
+    /**
      * @Route("/forms/add", name="forms_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse

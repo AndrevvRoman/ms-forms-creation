@@ -30,6 +30,22 @@ class FieldsController extends AbstractController
     }
 
     /**
+     * @Route("/fields", name="fields", methods={"GET"})
+     * @Security("is_granted('ROLE_USER')")
+     * @return JsonResponse
+     */
+    public function field(Request $request): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $id = $request->query->get('id');
+        $field = $em->getRepository(Field::class)->find($id);
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'message' => 'Field founded'
+        ]);
+    }
+
+    /**
      * @Route("/fields/add", name="fields_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
