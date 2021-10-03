@@ -11,11 +11,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\NormalizeService;
 
-
+/**
+ * @Route("/api/v1", name="forms")
+ */
 class FormsController extends AbstractController
 {
     /**
-     * @Route("/forms", name="forms", methods={"GET"})
+     * @Route("/forms/all", name="forms_all", methods={"GET"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -29,7 +31,7 @@ class FormsController extends AbstractController
     }
 
     /**
-     * @Route("/forms", name="forms", methods={"GET"})
+     * @Route("/forms/find", name="form_find", methods={"GET"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -38,14 +40,23 @@ class FormsController extends AbstractController
         $id = $request->query->get('id');
         $em = $this->getDoctrine()->getManager();
         $form = $em->getRepository(Form::class)->find($id);
+        if ($form == null)
+        {
+            return $this->json([
+                'data' =>  null,
+                'count' => 0,
+                'message' => 'Form not founded'
+            ]);    
+        }
         return $this->json([
             'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'count' => 1,
             'message' => 'Form founded'
         ]);
     }
 
     /**
-     * @Route("/forms/add", name="forms_add", methods={"POST"})
+     * @Route("/forms/add", name="form_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
@@ -68,7 +79,7 @@ class FormsController extends AbstractController
         ]);
     }
     /**
-     * @Route("/forms/remove", name="forms_remove", methods={"DELETE"})
+     * @Route("/forms/remove", name="form_remove", methods={"DELETE"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
@@ -95,7 +106,7 @@ class FormsController extends AbstractController
         ]);
     }
     /**
-     * @Route("/forms/update", name="forms_update", methods={"PATCH"})
+     * @Route("/forms/update", name="form_update", methods={"PATCH"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */

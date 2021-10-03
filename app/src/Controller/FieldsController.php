@@ -13,10 +13,13 @@ use App\Entity\Field;
 use App\Entity\Form;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @Route("/api/v1")
+ */
 class FieldsController extends AbstractController
 {
     /**
-     * @Route("/fields", name="fields", methods={"GET"})
+     * @Route("/fields/all", name="fields", methods={"GET"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -25,12 +28,14 @@ class FieldsController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $fields = $em->getRepository(Field::class)->findAll();
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($fields)
+            'data' =>  (new NormalizeService())->normalizeByGroup($fields),
+            'count' => count($fields),
+            'message' => 'All fields',
         ]);
     }
 
     /**
-     * @Route("/fields", name="fields", methods={"GET"})
+     * @Route("/fields/find", name="field", methods={"GET"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -39,8 +44,17 @@ class FieldsController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $id = $request->query->get('id');
         $field = $em->getRepository(Field::class)->find($id);
+        if ($field == null)
+        {
+            return $this->json([
+                'data' =>  null,
+                'count' => 0,
+                'message' => 'Field not founded'
+            ]);    
+        }
         return $this->json([
             'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'count' => 1,
             'message' => 'Field founded'
         ]);
     }
@@ -48,7 +62,7 @@ class FieldsController extends AbstractController
     /**
      * @Route("/fields/add", name="fields_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
-     * @return HttpResponse
+     * @return JsonResponse
      */
     public function fields_add(Request $request): Response
     {
@@ -79,7 +93,7 @@ class FieldsController extends AbstractController
     /**
      * @Route("/fields/remove", name="fields_remove", methods={"DELETE"})
      * @Security("is_granted('ROLE_USER')")
-     * @return HttpResponse
+     * @return JsonResponse
      */
     public function remove_field(Request $request,LoggerInterface $logger): Response
     {
@@ -107,7 +121,7 @@ class FieldsController extends AbstractController
     /**
      * @Route("/fields/update", name="fields_update", methods={"PATCH"})
      * @Security("is_granted('ROLE_USER')")
-     * @return HttpResponse
+     * @return JsonResponse
      */
     public function update_field(Request $request): Response
     {
