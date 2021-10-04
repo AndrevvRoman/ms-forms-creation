@@ -67,6 +67,7 @@ class FieldsController extends AbstractController
     public function fields_add(Request $request): Response
     {
         $isReqire = $request->request->get('isRequire');
+        $isActive = $request->request->get('isActive');
         $title = $request->request->get('title');
         $placeHolder = $request->request->get('placeHolder');
         $inputType = $request->request->get('inputType');
@@ -75,7 +76,7 @@ class FieldsController extends AbstractController
 
         $newField = new Field();
         $newField->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder);
-        $newField->setInputType($inputType)->setResponseType($responseType);
+        $newField->setInputType($inputType)->setResponseType($responseType)->setIsActive($isActive);
         $manager = $this->getDoctrine()->getManager();
 
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
@@ -136,6 +137,7 @@ class FieldsController extends AbstractController
         }
         
         $isReqire = $data['isRequire'];
+        $isActive = $data['isActive'];
         $title = $data['title'];
         $placeHolder = $data['placeHolder'];
         $inputType = $data['inputType'];
@@ -145,7 +147,7 @@ class FieldsController extends AbstractController
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
         
         $field->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType)->setResponseType($responseType);
-        $field->setIdFormFK($parentForm);
+        $field->setIdFormFK($parentForm)->setIsActive($isActive);
         $manager->flush();
 
         return $this->json([
