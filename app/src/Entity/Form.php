@@ -15,6 +15,7 @@ class Form
 {
     public function __construct() {
         $this->fields = new ArrayCollection();
+        $this->responses = new ArrayCollection();
     }
     /**
      * @ORM\Id
@@ -46,6 +47,11 @@ class Form
      * @ORM\Column(type="integer")
      */
     private $userId;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Response::class, mappedBy="formIdFK", orphanRemoval=true)
+     */
+    private $responses;
 
     public function getId(): ?int
     {
@@ -113,6 +119,36 @@ class Form
     public function setUserId(int $userId): self
     {
         $this->userId = $userId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Response[]
+     */
+    public function getResponses(): Collection
+    {
+        return $this->responses;
+    }
+
+    public function addResponse(Response $response): self
+    {
+        if (!$this->responses->contains($response)) {
+            $this->responses[] = $response;
+            $response->setFormIdFK($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResponse(Response $response): self
+    {
+        if ($this->responses->removeElement($response)) {
+            // set the owning side to null (unless already changed)
+            if ($response->getFormIdFK() === $this) {
+                $response->setFormIdFK(null);
+            }
+        }
 
         return $this;
     }
