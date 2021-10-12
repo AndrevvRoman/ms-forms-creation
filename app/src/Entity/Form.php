@@ -45,6 +45,7 @@ class Form
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"main"})
      */
     private $userId;
 

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ResponseRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -21,7 +22,6 @@ class Response
     /**
      * @ORM\ManyToOne(targetEntity=Form::class, inversedBy="responses")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"main"})
      */
     private $formIdFK;
 
