@@ -87,6 +87,7 @@ class FieldsController extends AbstractController
 
         return $this->json([
             'data' =>  (new NormalizeService())->normalizeByGroup($newField),
+            'count' => 1,
             'message' => 'Field created'
         ]);
     }
@@ -106,7 +107,8 @@ class FieldsController extends AbstractController
         if ($field == null)
         {
             return $this->json([
-                'message' => 'Field not found'
+                'message' => 'Field not found',
+                'count' => 0
             ]);    
         }
 
@@ -115,6 +117,7 @@ class FieldsController extends AbstractController
 
         return $this->json([
             'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'count' => 1,
             'message' => 'Field deleted'
         ]);
     }
@@ -152,6 +155,7 @@ class FieldsController extends AbstractController
 
         return $this->json([
             'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'count' => 1,
             'message' => 'Field updated'
         ]);
     }

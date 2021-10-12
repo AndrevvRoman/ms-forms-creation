@@ -25,8 +25,10 @@ class FormsController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $forms = $em->getRepository(Form::class)->findAll();
+        $data = (new NormalizeService())->normalizeByGroup($forms);
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($forms)
+            'data' =>  $data,
+            'count' => count($data)
         ]);
     }
 
@@ -64,8 +66,11 @@ class FormsController extends AbstractController
     {
         $name = $request->request->get('name');
         $title = $request->request->get('title');
-        $userId = $request->request->get('userId');
 
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        $userId = $user->getId();
+                 
         $newForm = new Form();
         $newForm->setName($name)->setTitle($title)->setUserId($userId);
 
@@ -75,6 +80,7 @@ class FormsController extends AbstractController
 
         return $this->json([
             'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
+            'count' => 1,
             'message' => 'Form created'
         ]);
     }
@@ -102,12 +108,14 @@ class FormsController extends AbstractController
 
         return $this->json([
             'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'count' => 1,
             'message' => 'Form deleted'
         ]);
     }
     /**
      * @Route("/forms/update", name="form_update", methods={"PATCH"})
      * @Security("is_granted('ROLE_USER')")
+     * 
      * @return HttpResponse
      */
     public function update_from(Request $request): Response
@@ -126,13 +134,17 @@ class FormsController extends AbstractController
 
         $name = $data['name'];
         $title = $data['title'];
-        $userId = $data['userId'];
+
+         /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        $userId = $user->getId();
 
         $form->setName($name)->setTitle($title)->setUserId($userId);
         $manager->flush();
         
         return $this->json([
             'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'count' => 1,
             'message' => 'Form updated'
         ]);
     }
