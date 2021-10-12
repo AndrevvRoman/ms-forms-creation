@@ -14,9 +14,7 @@ class NormalizeService
 
     public function __construct()
     {
-        $this->datetimeFormat = function ($innerObject, $outerObject, string $attributeName, string $format = null, array $context = []) {
-            return $innerObject instanceof \DateTime ? $innerObject->format(\DateTime::ISO8601) : '';
-        };
+
     }
 
     public function normalizeByGroup($object, $groups = ['groups' => 'main']) {
@@ -25,9 +23,6 @@ class NormalizeService
 
         return $serializer->normalize($object, null, [
             'groups' => $groups['groups'],
-            AbstractNormalizer::CALLBACKS => [
-                'moment' => $this->datetimeFormat,
-            ],
         ]);
     }
 }
