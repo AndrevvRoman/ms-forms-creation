@@ -47,7 +47,7 @@ class FieldsController extends AbstractController
         if ($field == null)
         {
             return $this->json([
-                'data' =>  null,
+                'data' =>  [],
                 'count' => 0,
                 'message' => 'Field not founded'
             ]);    
@@ -71,15 +71,22 @@ class FieldsController extends AbstractController
         $title = $request->request->get('title');
         $placeHolder = $request->request->get('placeHolder');
         $inputType = $request->request->get('inputType');
-        $responseType = $request->request->get('responseType');
         $parentId = $request->request->get('idForm');
 
         $newField = new Field();
         $newField->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder);
-        $newField->setInputType($inputType)->setResponseType($responseType)->setIsActive($isActive);
+        $newField->setInputType($inputType)->setIsActive($isActive);
         $manager = $this->getDoctrine()->getManager();
 
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
+        if ($parentForm == null)
+        {
+            return $this->json([
+                'data' =>  [],
+                'count' => 0,
+                'message' => 'Parent from not founded'
+            ]);
+        }
         $newField->setIdFormFK($parentForm);
 
         $manager->persist($newField);
@@ -107,6 +114,7 @@ class FieldsController extends AbstractController
         if ($field == null)
         {
             return $this->json([
+                'data' => [],
                 'message' => 'Field not found',
                 'count' => 0
             ]);    
@@ -136,7 +144,11 @@ class FieldsController extends AbstractController
         $field = $manager->getRepository(Field::class)->find($id);
         if ($field == null)
         {
-            return new Response(Response::HTTP_NOT_FOUND);    
+            return $this->json([
+                'data' =>  [],
+                'count' => 0,
+                'message' => 'Field not founded'
+            ]);
         }
         
         $isReqire = $data['isRequire'];
@@ -144,12 +156,18 @@ class FieldsController extends AbstractController
         $title = $data['title'];
         $placeHolder = $data['placeHolder'];
         $inputType = $data['inputType'];
-        $responseType = $data['responseType'];
         $parentId = $data['idForm'];
         $manager = $this->getDoctrine()->getManager();
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
-        
-        $field->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType)->setResponseType($responseType);
+        if ($parentForm == null)
+        {
+            return $this->json([
+                'data' =>  [],
+                'count' => 0,
+                'message' => 'Parent from not founded'
+            ]);
+        }
+        $field->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType);
         $field->setIdFormFK($parentForm)->setIsActive($isActive);
         $manager->flush();
 
