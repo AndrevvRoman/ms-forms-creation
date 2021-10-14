@@ -58,13 +58,41 @@ class ResponseController extends AbstractController
         $limit = $r->query->get('limit');
         $offset = $r->query->get('offset');
         $em = $this->getDoctrine()->getManager();
-        $responses = $em->getRepository(Form::class)->find($formId)->getResponses();
-        // $responses = $em->getRepository(EntityResponse::class)->findAll();
+        $responses = $em->getRepository(EntityResponse::class)->findBy(array('formIdFK' => $formId),null,$limit,$offset);
 
         return $this->json([
             'data' => (new NormalizeService)->normalizeByGroup($responses),
-            'count' => count($responses),
-            'messgae' => 'Form founded'
+            'count' => count($responses), //TODO считать сколько всего респонсов, а не в текущем ответе
+            'messgae' => 'Form and responses founded'
+        ]);
+    }
+
+    /**
+     * @Route("/response/remove", name="response_remove", methods={"POST"})
+     * @Security("is_granted('ROLE_USER')")
+     */
+    public function remove_response(Request $r): Response
+    {
+        // Добавить удаление по массиву id,а не по одному
+        $responseId = $r->request->get('id');
+        $em = $this->getDoctrine()->getManager();
+        $response = $em->getRepository(EntityResponse::class)->find($responseId);
+        if ($response == null)
+        {
+            return $this->json([
+                'data' => [],
+                'count' => 0,
+                'messgae' => 'Response not founded'
+            ]);
+        }
+
+        $em->remove($response);
+        $em->flush();
+
+        return $this->json([
+            'data' => (new NormalizeService)->normalizeByGroup($response),
+            'count' => 1,
+            'messgae' => 'Response deleted'
         ]);
     }
 }
