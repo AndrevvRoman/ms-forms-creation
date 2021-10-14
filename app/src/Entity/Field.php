@@ -24,6 +24,7 @@ class Field
     private const INPUT_TYPE_DATE = "date";
     private const INPUT_TYPE_TIME = "time";
     private const INPUT_TYPE_DATETIME = "datetime";
+    private const INPUT_TYPE_DATETIME_LOCAL = "datetime-local";
     private const INPUT_TYPE_MOUTH = "month";
     private const INPUT_TYPE_WEEK = "week";
     private const INPUT_TYPE_EMAIL = "email";
@@ -44,6 +45,7 @@ class Field
         Field::INPUT_TYPE_DATE ,
         Field::INPUT_TYPE_TIME ,
         Field::INPUT_TYPE_DATETIME ,
+        Field::INPUT_TYPE_DATETIME_LOCAL,
         Field::INPUT_TYPE_MOUTH ,
         Field::INPUT_TYPE_WEEK ,
         Field::INPUT_TYPE_EMAIL ,
