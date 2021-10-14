@@ -63,7 +63,7 @@ class ResponseController extends AbstractController
         return $this->json([
             'data' => (new NormalizeService)->normalizeByGroup($responses),
             'count' => count($responses), //TODO считать сколько всего респонсов, а не в текущем ответе
-            'messgae' => 'Form and responses founded'
+            'messgae' => 'Form and responses'
         ]);
     }
 
