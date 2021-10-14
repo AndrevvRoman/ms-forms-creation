@@ -28,6 +28,7 @@ class FormsController extends AbstractController
         $data = (new NormalizeService())->normalizeByGroup($forms);
         return $this->json([
             'data' =>  $data,
+            'message' => 'All forms',
             'count' => count($data)
         ]);
     }
@@ -66,10 +67,8 @@ class FormsController extends AbstractController
     {
         $name = $request->request->get('name');
         $title = $request->request->get('title');
-
-        /** @var \App\Entity\User $user */
-        $user = $this->getUser();
-        $userId = $user->getId();
+        
+        $userId = $this->getUser()->getId();
                  
         $newForm = new Form();
         $newForm->setName($name)->setTitle($title)->setUserId($userId);
@@ -99,7 +98,9 @@ class FormsController extends AbstractController
         if ($form == null)
         {
             return $this->json([
-                'message' => 'Form not found'
+                'data' => [],
+                'message' => 'Form not found',
+                'count' => 0
             ]);
         }
 
@@ -128,16 +129,16 @@ class FormsController extends AbstractController
         if ($form == null)
         {
             return $this->json([
-                'message' => 'Form not found'
+                'data' => [],
+                'message' => 'Form not found',
+                'count' => 0
             ]);  
         }
 
         $name = $data['name'];
         $title = $data['title'];
 
-         /** @var \App\Entity\User $user */
-        $user = $this->getUser();
-        $userId = $user->getId();
+        $userId = $this->getUser()->getId();
 
         $form->setName($name)->setTitle($title)->setUserId($userId);
         $manager->flush();

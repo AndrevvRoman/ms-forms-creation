@@ -28,6 +28,14 @@ class ResponseController extends AbstractController
 
         $em = $this->getDoctrine()->getManager();
         $parentForm = $em->getRepository(Form::class)->find($formId);
+        if ($parentForm == null)
+        {
+            return $this->json([
+                'data' => [],
+                'message' => 'Form not found',
+                'count' => 0
+            ]);  
+        }
 
         $newResponse = new EntityResponse();
         $newResponse->setFormIdFK($parentForm)->setResponseBody($requestBody['responseBody']);
