@@ -59,6 +59,32 @@ class FormsController extends AbstractController
     }
 
     /**
+     * @Route("/forms/find/fields", name="form_find_fields", methods={"GET"})
+     * @Security("is_granted('ROLE_USER')")
+     * @return JsonResponse
+     */
+    public function find_form_fields(Request $request): Response
+    {
+        $id = $request->query->get('id');
+        $em = $this->getDoctrine()->getManager();
+        $form = $em->getRepository(Form::class)->find($id);
+        if ($form == null)
+        {
+            return $this->json([
+                'data' =>  null,
+                'count' => 0,
+                'message' => 'Form not founded'
+            ]);    
+        }
+        $fields = $form->getFields();
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($fields),
+            'count' => 1,
+            'message' => 'Form founded'
+        ]);
+    }
+
+    /**
      * @Route("/forms/add", name="form_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
