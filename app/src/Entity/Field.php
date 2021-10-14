@@ -13,7 +13,6 @@ use Proxies\__CG__\App\Entity\InputType;
 class Field
 {
     private const INPUT_TYPE_DEFAULT = "default";
-    private const INPUT_TYPE_BUTTON = "button";
     private const INPUT_TYPE_CHECKBOX = "checkbox";
     private const INPUT_TYPE_FILE = "file";
     private const INPUT_TYPE_IMAGE = "image";
@@ -35,7 +34,6 @@ class Field
 
     const inputTypes = array(
         Field::INPUT_TYPE_DEFAULT,
-        Field::INPUT_TYPE_BUTTON ,
         Field::INPUT_TYPE_CHECKBOX ,
         Field::INPUT_TYPE_FILE ,
         Field::INPUT_TYPE_IMAGE ,
@@ -55,29 +53,6 @@ class Field
         Field::INPUT_TYPE_URL ,        
     );
 
-    private const RESPONSE_TYPE_DEFAULT = "default";
-    private const RESPONSE_TYPE_INTEGER = "integer";
-    private const RESPONSE_TYPE_BOOL = "bool";
-    private const RESPONSE_TYPE_FLOAT = "float";
-    private const RESPONSE_TYPE_STRING = "string";
-    private const RESPONSE_TYPE_DATE = "date";
-    private const RESPONSE_TYPE_TIME = "time";
-    private const RESPONSE_TYPE_DATETIME = "datetime";
-    private const RESPONSE_TYPE_COLOR = "color";
-    private const RESPONSE_TYPE_FILE = "file";
-
-    const responseTypes = array(
-        Field::RESPONSE_TYPE_DEFAULT,
-        Field::RESPONSE_TYPE_INTEGER,
-        Field::RESPONSE_TYPE_BOOL,
-        Field::RESPONSE_TYPE_FLOAT,
-        Field::RESPONSE_TYPE_STRING,
-        Field::RESPONSE_TYPE_DATE,
-        Field::RESPONSE_TYPE_TIME,
-        Field::RESPONSE_TYPE_DATETIME,
-        Field::RESPONSE_TYPE_COLOR,
-        Field::RESPONSE_TYPE_FILE,
-    );
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -114,12 +89,6 @@ class Field
      * @Groups({"main"})
      */
     private $inputType;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"main"})
-     */
-    private $responseType;
 
     /**
      * @ORM\Column(type="boolean")
@@ -183,10 +152,6 @@ class Field
     {
         return in_array($inputType,Field::inputTypes);
     }
-    public function validateResponseType($responseType)
-    {
-        return in_array($responseType,Field::responseTypes);
-    }
 
     public function getInputType(): ?string
     {
@@ -198,21 +163,6 @@ class Field
         if ($this->validateInputType($inputType))
         {
             $this->inputType = $inputType;
-        }
-
-        return $this;
-    }
-
-    public function getResponseType(): ?string
-    {
-        return $this->responseType;
-    }
-
-    public function setResponseType(string $responseType): self
-    {
-        if ($this->validateResponseType($responseType))
-        {
-            $this->responseType = $responseType;
         }
 
         return $this;
