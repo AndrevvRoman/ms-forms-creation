@@ -39,7 +39,7 @@ class Form
 
     /**
      * @ORM\OneToMany(targetEntity=Field::class, mappedBy="idFormFK", orphanRemoval=true)
-     * @Groups({"main"})
+     * @Groups({"additional"})
      */
     private $fields;
 

@@ -21,11 +21,19 @@ class FormsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
-    public function forms(): Response
+    public function forms(Request $r): Response
     {
+        $isFieldsReqire = $r->query->get('all',false);
         $em = $this->getDoctrine()->getManager();
         $forms = $em->getRepository(Form::class)->findAll();
-        $data = (new NormalizeService())->normalizeByGroup($forms);
+        if (!$isFieldsReqire)
+        {
+            $data = (new NormalizeService())->normalizeByGroup($forms);
+        }
+        else
+        {
+            $data = (new NormalizeService())->normalizeByGroup($forms,['groups' => ['main','additional']]);
+        }
         return $this->json([
             'data' =>  $data,
             'message' => 'All forms',
@@ -38,11 +46,20 @@ class FormsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
-    public function form(Request $request): Response
+    public function form(Request $r): Response
     {
-        $id = $request->query->get('id');
+        $isFieldsReqire = $r->query->get('all',false);
+        $id = $r->query->get('id');
         $em = $this->getDoctrine()->getManager();
         $form = $em->getRepository(Form::class)->find($id);
+        if (!$isFieldsReqire)
+        {
+            $data = (new NormalizeService())->normalizeByGroup($form);
+        }
+        else
+        {
+            $data = (new NormalizeService())->normalizeByGroup($form,['groups' => ['main','additional']]);
+        }
         if ($form == null)
         {
             return $this->json([
@@ -52,7 +69,7 @@ class FormsController extends AbstractController
             ]);    
         }
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'data' =>  $data,
             'count' => 1,
             'message' => 'Form founded'
         ]);
