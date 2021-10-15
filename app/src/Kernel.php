@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-
+use Nelmio\CorsBundle\NelmioCorsBundle;
 class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
@@ -34,5 +34,14 @@ class Kernel extends BaseKernel
         } else {
             $routes->import('../config/{routes}.php');
         }
+    }
+    public function registerBundles()
+    {
+        $bundles = [
+            // ...
+            new NelmioCorsBundle(),
+            // ...
+        ];
+        // ...
     }
 }
