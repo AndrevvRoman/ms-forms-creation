@@ -54,9 +54,10 @@ class ResponseController extends AbstractController
      */
     public function get_response(Request $r): Response
     {
-        $formId = $r->query->get('formId');
-        $limit = $r->query->get('limit');
-        $offset = $r->query->get('offset');
+        $data = json_decode($r->getContent(), true);
+        $formId = $data['formId'];
+        $limit = $data['limit'];
+        $offset = $data['offset'];
         $em = $this->getDoctrine()->getManager();
         $responses = $em->getRepository(EntityResponse::class)->findBy(array('formIdFK' => $formId),null,$limit,$offset);
 
@@ -74,7 +75,8 @@ class ResponseController extends AbstractController
     public function remove_response(Request $r): Response
     {
         // Добавить удаление по массиву id,а не по одному
-        $responseId = $r->request->get('id');
+        $data = json_decode($r->getContent(), true);
+        $responseId = $data['id'];
         $em = $this->getDoctrine()->getManager();
         $response = $em->getRepository(EntityResponse::class)->find($responseId);
         if ($response == null)
