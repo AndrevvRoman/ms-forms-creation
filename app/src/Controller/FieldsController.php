@@ -59,11 +59,11 @@ class FieldsController extends AbstractController
     }
 
     /**
-     * @Route("/fields/add", name="fields_add", methods={"POST"})
+     * @Route("/fields/add", name="field_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
-    public function fields_add(Request $r): Response
+    public function field_add(Request $r): Response
     {
         $data = json_decode($r->getContent(), true);
         $isReqire = $data['isRequire'];
@@ -72,10 +72,11 @@ class FieldsController extends AbstractController
         $placeHolder = $data['placeHolder'];
         $inputType = $data['inputType'];
         $parentId = $data['idForm'];
+        $possbleValues = $data['possbleValues'] ?? array();
 
         $newField = new Field();
         $newField->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder);
-        $newField->setInputType($inputType)->setIsActive($isActive);
+        $newField->setInputType($inputType)->setIsActive($isActive)->setPossbleValues($possbleValues);
         $manager = $this->getDoctrine()->getManager();
 
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
@@ -154,6 +155,8 @@ class FieldsController extends AbstractController
         $placeHolder = $data['placeHolder'];
         $inputType = $data['inputType'];
         $parentId = $data['idForm'];
+        $possbleValues = $data['possbleValues'];
+
         $manager = $this->getDoctrine()->getManager();
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
         if ($parentForm == null) {
@@ -164,7 +167,7 @@ class FieldsController extends AbstractController
             ]);
         }
         $field->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType);
-        $field->setIdFormFK($parentForm)->setIsActive($isActive);
+        $field->setIdFormFK($parentForm)->setIsActive($isActive)->setPossbleValues($possbleValues);
         $manager->flush();
 
         return $this->json([

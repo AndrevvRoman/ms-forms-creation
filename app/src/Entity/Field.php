@@ -97,6 +97,12 @@ class Field
      */
     private $isActive;
 
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Groups({"main"})
+     */
+    private $possbleValues = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -178,6 +184,18 @@ class Field
     public function setIsActive(bool $isActive): self
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getPossbleValues(): ?array
+    {
+        return $this->possbleValues;
+    }
+
+    public function setPossbleValues(?array $possbleValues): self
+    {
+        $this->possbleValues = $possbleValues;
 
         return $this;
     }
