@@ -23,7 +23,8 @@ class FormsController extends AbstractController
      */
     public function forms(Request $r): Response
     {
-        $isFieldsReqire = $r->query->get('all',false);
+        $data = json_decode($r->getContent(), true);
+        $isFieldsReqire = $data['all'] ?? false;
         $em = $this->getDoctrine()->getManager();
         $forms = $em->getRepository(Form::class)->findAll();
         if (!$isFieldsReqire)
@@ -48,8 +49,9 @@ class FormsController extends AbstractController
      */
     public function form(Request $r): Response
     {
-        $isFieldsReqire = $r->query->get('all',false);
-        $id = $r->query->get('id');
+        $data = json_decode($r->getContent(), true);
+        $isFieldsReqire = $data['all'] ?? false;
+        $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
         $form = $em->getRepository(Form::class)->find($id);
         if (!$isFieldsReqire)
@@ -80,9 +82,10 @@ class FormsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
-    public function find_form_fields(Request $request): Response
+    public function find_form_fields(Request $r): Response
     {
-        $id = $request->query->get('id');
+        $data = json_decode($r->getContent(), true);
+        $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
         $form = $em->getRepository(Form::class)->find($id);
         if ($form == null)
@@ -106,10 +109,11 @@ class FormsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
-    public function add_forms(Request $request): Response
+    public function add_forms(Request $r): Response
     {
-        $name = $request->request->get('name');
-        $title = $request->request->get('title');
+        $data = json_decode($r->getContent(), true);
+        $name = $data['name'];
+        $title = $data['title'];
         
         $userId = $this->getUser()->getId();
                  

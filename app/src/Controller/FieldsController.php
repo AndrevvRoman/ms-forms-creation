@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\NormalizeService;
 use App\Entity\Field;
 use App\Entity\Form;
-use Psr\Log\LoggerInterface;
 
 /**
  * @Route("/api/v1")
@@ -28,7 +27,7 @@ class FieldsController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $fields = $em->getRepository(Field::class)->findAll();
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($fields),
+            'data' => (new NormalizeService())->normalizeByGroup($fields),
             'count' => count($fields),
             'message' => 'All fields',
         ]);
@@ -39,21 +38,21 @@ class FieldsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
-    public function field(Request $request): Response
+    public function field(Request $r): Response
     {
         $em = $this->getDoctrine()->getManager();
-        $id = $request->query->get('id');
+        $data = json_decode($r->getContent(), true);
+        $id = $data['id'];
         $field = $em->getRepository(Field::class)->find($id);
-        if ($field == null)
-        {
+        if ($field == null) {
             return $this->json([
                 'data' =>  [],
                 'count' => 0,
                 'message' => 'Field not founded'
-            ]);    
+            ]);
         }
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'data' => (new NormalizeService())->normalizeByGroup($field),
             'count' => 1,
             'message' => 'Field founded'
         ]);
@@ -64,14 +63,15 @@ class FieldsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
-    public function fields_add(Request $request): Response
+    public function fields_add(Request $r): Response
     {
-        $isReqire = $request->request->get('isRequire');
-        $isActive = $request->request->get('isActive');
-        $title = $request->request->get('title');
-        $placeHolder = $request->request->get('placeHolder');
-        $inputType = $request->request->get('inputType');
-        $parentId = $request->request->get('idForm');
+        $data = json_decode($r->getContent(), true);
+        $isReqire = $data['isRequire'];
+        $isActive = $data['isActive'];
+        $title = $data['title'];
+        $placeHolder = $data['placeHolder'];
+        $inputType = $data['inputType'];
+        $parentId = $data['idForm'];
 
         $newField = new Field();
         $newField->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder);
@@ -79,8 +79,7 @@ class FieldsController extends AbstractController
         $manager = $this->getDoctrine()->getManager();
 
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
-        if ($parentForm == null)
-        {
+        if ($parentForm == null) {
             return $this->json([
                 'data' =>  [],
                 'count' => 0,
@@ -93,7 +92,7 @@ class FieldsController extends AbstractController
         $manager->flush();
 
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($newField),
+            'data' => (new NormalizeService())->normalizeByGroup($newField),
             'count' => 1,
             'message' => 'Field created'
         ]);
@@ -104,27 +103,26 @@ class FieldsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
-    public function remove_field(Request $request,LoggerInterface $logger): Response
+    public function remove_field(Request $r): Response
     {
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode($r->getContent(), true);
         $id = $data['id'];
 
         $manager = $this->getDoctrine()->getManager();
         $field = $manager->getRepository(Field::class)->find($id);
-        if ($field == null)
-        {
+        if ($field == null) {
             return $this->json([
                 'data' => [],
                 'message' => 'Field not found',
                 'count' => 0
-            ]);    
+            ]);
         }
 
         $manager->remove($field);
         $manager->flush();
 
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'data' => (new NormalizeService())->normalizeByGroup($field),
             'count' => 1,
             'message' => 'Field deleted'
         ]);
@@ -135,22 +133,21 @@ class FieldsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
-    public function update_field(Request $request): Response
+    public function update_field(Request $r): Response
     {
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode($r->getContent(), true);
         $id = $data['id'];
-        
+
         $manager = $this->getDoctrine()->getManager();
         $field = $manager->getRepository(Field::class)->find($id);
-        if ($field == null)
-        {
+        if ($field == null) {
             return $this->json([
                 'data' =>  [],
                 'count' => 0,
                 'message' => 'Field not founded'
             ]);
         }
-        
+
         $isReqire = $data['isRequire'];
         $isActive = $data['isActive'];
         $title = $data['title'];
@@ -159,8 +156,7 @@ class FieldsController extends AbstractController
         $parentId = $data['idForm'];
         $manager = $this->getDoctrine()->getManager();
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
-        if ($parentForm == null)
-        {
+        if ($parentForm == null) {
             return $this->json([
                 'data' =>  [],
                 'count' => 0,
@@ -172,7 +168,7 @@ class FieldsController extends AbstractController
         $manager->flush();
 
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($field),
+            'data' => (new NormalizeService())->normalizeByGroup($field),
             'count' => 1,
             'message' => 'Field updated'
         ]);
