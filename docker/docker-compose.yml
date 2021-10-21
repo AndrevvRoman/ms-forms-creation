@@ -20,7 +20,6 @@ services:
       context: ./php
     ports: 
       - '9000:9000'
-      - '9001:9001'
     volumes: 
       - ../app:/var/www/php_forms_creation
     depends_on: 
@@ -30,7 +29,6 @@ services:
     image: nginx:latest
     ports: 
       - '8080:80'
-      - '8090:90'
     volumes: 
       - ../app:/var/www/php_forms_creation
       - ./logs/nginx:/var/log/nginx
