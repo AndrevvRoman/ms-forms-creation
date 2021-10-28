@@ -14,6 +14,7 @@ use App\Service\NormalizeService;
 
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+
 /**
  * @Route("/api/v1", name="forms")
  */
@@ -30,13 +31,10 @@ class FormsController extends AbstractController
         $isFieldsReqire = $data['all'] ?? false;
         $em = $this->getDoctrine()->getManager();
         $forms = $em->getRepository(Form::class)->findAll();
-        if (!$isFieldsReqire)
-        {
+        if (!$isFieldsReqire) {
             $data = (new NormalizeService())->normalizeByGroup($forms);
-        }
-        else
-        {
-            $data = (new NormalizeService())->normalizeByGroup($forms,['groups' => ['main','additional']]);
+        } else {
+            $data = (new NormalizeService())->normalizeByGroup($forms, ['groups' => ['main', 'additional']]);
         }
         return $this->json([
             'data' =>  $data,
@@ -57,21 +55,17 @@ class FormsController extends AbstractController
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
         $form = $em->getRepository(Form::class)->find($id);
-        if (!$isFieldsReqire)
-        {
+        if (!$isFieldsReqire) {
             $data = (new NormalizeService())->normalizeByGroup($form);
+        } else {
+            $data = (new NormalizeService())->normalizeByGroup($form, ['groups' => ['main', 'additional']]);
         }
-        else
-        {
-            $data = (new NormalizeService())->normalizeByGroup($form,['groups' => ['main','additional']]);
-        }
-        if ($form == null)
-        {
+        if ($form == null) {
             return $this->json([
                 'data' =>  null,
                 'count' => 0,
                 'message' => 'Form not founded'
-            ]);    
+            ]);
         }
         return $this->json([
             'data' =>  $data,
@@ -91,17 +85,16 @@ class FormsController extends AbstractController
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
         $form = $em->getRepository(Form::class)->find($id);
-        if ($form == null)
-        {
+        if ($form == null) {
             return $this->json([
                 'data' =>  null,
                 'count' => 0,
                 'message' => 'Form not founded'
-            ]);    
+            ]);
         }
         $fields = $form->getFields();
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($fields),
+            'data' => (new NormalizeService())->normalizeByGroup($fields),
             'count' => 1,
             'message' => 'Form founded'
         ]);
@@ -112,14 +105,14 @@ class FormsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
-    public function add_forms(Request $r,HubInterface $hub): Response
+    public function add_forms(Request $r, HubInterface $hub): Response
     {
         $data = json_decode($r->getContent(), true);
         $name = $data['name'];
         $title = $data['title'];
-        
+
         $userId = $this->getUser()->getId();
-                 
+
         $newForm = new Form();
         $newForm->setName($name)->setTitle($title)->setUserId($userId);
 
@@ -129,33 +122,33 @@ class FormsController extends AbstractController
 
         $update = new Update(
             'subscribe_add_form',
-            json_encode(['status' => 'OutOfStock'])
+            json_encode($this->json([
+                'data' => (new NormalizeService())->normalizeByGroup($newForm),
+                'count' => 1,
+                'message' => 'Form created'
+            ]))
         );
-
         $hub->publish($update);
 
-        return new Response('published!');
-
-        // return $this->json([
-        //     'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
-        //     'count' => 1,
-        //     'message' => 'Form created'
-        // ]);
+        return $this->json([
+            'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
+            'count' => 1,
+            'message' => 'Form created'
+        ]);
     }
     /**
      * @Route("/forms/remove", name="form_remove", methods={"DELETE"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
-    public function remove_from(Request $request): Response
+    public function remove_from(Request $request, HubInterface $hub): Response
     {
         $data = json_decode($request->getContent(), true);
         $id = $data['id'];
 
         $manager = $this->getDoctrine()->getManager();
         $form = $manager->getRepository(Form::class)->find($id);
-        if ($form == null)
-        {
+        if ($form == null) {
             return $this->json([
                 'data' => [],
                 'message' => 'Form not found',
@@ -166,8 +159,16 @@ class FormsController extends AbstractController
         $manager->remove($form);
         $manager->flush();
 
+        $update = new Update(
+            'subscribe_delete_form',
+            json_encode($this->json([
+                'id' => $id,
+            ]))
+        );
+        $hub->publish($update);
+
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'data' => (new NormalizeService())->normalizeByGroup($form),
             'count' => 1,
             'message' => 'Form deleted'
         ]);
@@ -178,20 +179,19 @@ class FormsController extends AbstractController
      * 
      * @return HttpResponse
      */
-    public function update_from(Request $request): Response
+    public function update_from(Request $request, HubInterface $hub): Response
     {
         $data = json_decode($request->getContent(), true);
         $id = $data['id'];
 
         $manager = $this->getDoctrine()->getManager();
         $form = $manager->getRepository(Form::class)->find($id);
-        if ($form == null)
-        {
+        if ($form == null) {
             return $this->json([
                 'data' => [],
                 'message' => 'Form not found',
                 'count' => 0
-            ]);  
+            ]);
         }
 
         $name = $data['name'];
@@ -201,9 +201,19 @@ class FormsController extends AbstractController
 
         $form->setName($name)->setTitle($title)->setUserId($userId);
         $manager->flush();
-        
+
+        $update = new Update(
+            'subscribe_update_form',
+            json_encode($this->json([
+                'name' => $name,
+                'title' => $title,
+                'id' => $id
+            ]))
+        );
+        $hub->publish($update);
+
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($form),
+            'data' => (new NormalizeService())->normalizeByGroup($form),
             'count' => 1,
             'message' => 'Form updated'
         ]);
