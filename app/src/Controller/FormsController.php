@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\NormalizeService;
 
+
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 /**
  * @Route("/api/v1", name="forms")
  */
@@ -109,7 +112,7 @@ class FormsController extends AbstractController
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
      */
-    public function add_forms(Request $r): Response
+    public function add_forms(Request $r,HubInterface $hub): Response
     {
         $data = json_decode($r->getContent(), true);
         $name = $data['name'];
@@ -124,11 +127,20 @@ class FormsController extends AbstractController
         $manager->persist($newForm);
         $manager->flush();
 
-        return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
-            'count' => 1,
-            'message' => 'Form created'
-        ]);
+        $update = new Update(
+            'subscribe_add_form',
+            json_encode(['status' => 'OutOfStock'])
+        );
+
+        $hub->publish($update);
+
+        return new Response('published!');
+
+        // return $this->json([
+        //     'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
+        //     'count' => 1,
+        //     'message' => 'Form created'
+        // ]);
     }
     /**
      * @Route("/forms/remove", name="form_remove", methods={"DELETE"})
