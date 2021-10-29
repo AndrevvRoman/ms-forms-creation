@@ -122,11 +122,11 @@ class FormsController extends AbstractController
 
         $update = new Update(
             'subscribe_add_form',
-            json_encode($this->json([
-                'data' => (new NormalizeService())->normalizeByGroup($newForm),
-                'count' => 1,
-                'message' => 'Form created'
-            ]))
+            json_encode([
+                'name' => $name,
+                'title' => $title,
+                'id' => $newForm->getId()
+            ])
         );
         $hub->publish($update);
 
@@ -161,9 +161,9 @@ class FormsController extends AbstractController
 
         $update = new Update(
             'subscribe_delete_form',
-            json_encode($this->json([
+            json_encode([
                 'id' => $id,
-            ]))
+            ])
         );
         $hub->publish($update);
 
@@ -204,11 +204,11 @@ class FormsController extends AbstractController
 
         $update = new Update(
             'subscribe_update_form',
-            json_encode($this->json([
+            json_encode([
                 'name' => $name,
                 'title' => $title,
                 'id' => $id
-            ]))
+            ])
         );
         $hub->publish($update);
 
