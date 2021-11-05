@@ -1,8 +1,6 @@
 .idea/
-.env
 /docker/logs/
 /docker/db/
-/docker/.env
 .DS_Store
 logs
 mysql
