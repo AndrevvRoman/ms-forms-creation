@@ -7,7 +7,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Form;
-use App\Message\FormAdd;
 use App\Message\FormAddMessage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -103,7 +102,7 @@ class FormsController extends AbstractController
         ]);
     }
 
-        /**
+    /**
      * @Route("/rabbit/forms/add", name="form_add_rabbit", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
@@ -113,34 +112,10 @@ class FormsController extends AbstractController
         $data = json_decode($r->getContent(), true);
         $name = $data['name'];
         $title = $data['title'];
-
-        $bus->dispatch(new FormAddMessage($name,$title));
+        $userId = $this->getUser()->getId();
+        $bus->dispatch(new FormAddMessage($name, $title, $userId));
 
         return new Response('You form has been placed');
-        // $userId = $this->getUser()->getId();
-
-        // $newForm = new Form();
-        // $newForm->setName($name)->setTitle($title)->setUserId($userId);
-
-        // $manager = $this->getDoctrine()->getManager();
-        // $manager->persist($newForm);
-        // $manager->flush();
-
-        // $update = new Update(
-        //     'subscribe_add_form',
-        //     json_encode([
-        //         'name' => $name,
-        //         'title' => $title,
-        //         'id' => $newForm->getId()
-        //     ])
-        // );
-        // $hub->publish($update);
-
-        // return $this->json([
-        //     'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
-        //     'count' => 1,
-        //     'message' => 'Form created'
-        // ]);
     }
 
     /**
@@ -174,7 +149,7 @@ class FormsController extends AbstractController
         $hub->publish($update);
 
         return $this->json([
-            'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
+            'data' => (new NormalizeService())->normalizeByGroup($newForm),
             'count' => 1,
             'message' => 'Form created'
         ]);
