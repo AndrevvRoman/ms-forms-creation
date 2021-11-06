@@ -7,6 +7,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Form;
+use App\Message\FormAdd;
+use App\Message\FormAddMessage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\NormalizeService;
@@ -14,6 +16,7 @@ use App\Service\NormalizeService;
 
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @Route("/api/v1", name="forms")
@@ -98,6 +101,46 @@ class FormsController extends AbstractController
             'count' => 1,
             'message' => 'Form founded'
         ]);
+    }
+
+        /**
+     * @Route("/rabbit/forms/add", name="form_add_rabbit", methods={"POST"})
+     * @Security("is_granted('ROLE_USER')")
+     * @return HttpResponse
+     */
+    public function add_forms_rabbit(Request $r, HubInterface $hub, MessageBusInterface $bus): Response
+    {
+        $data = json_decode($r->getContent(), true);
+        $name = $data['name'];
+        $title = $data['title'];
+
+        $bus->dispatch(new FormAddMessage($name,$title));
+
+        return new Response('You form has been placed');
+        // $userId = $this->getUser()->getId();
+
+        // $newForm = new Form();
+        // $newForm->setName($name)->setTitle($title)->setUserId($userId);
+
+        // $manager = $this->getDoctrine()->getManager();
+        // $manager->persist($newForm);
+        // $manager->flush();
+
+        // $update = new Update(
+        //     'subscribe_add_form',
+        //     json_encode([
+        //         'name' => $name,
+        //         'title' => $title,
+        //         'id' => $newForm->getId()
+        //     ])
+        // );
+        // $hub->publish($update);
+
+        // return $this->json([
+        //     'data' =>  (new NormalizeService())->normalizeByGroup($newForm),
+        //     'count' => 1,
+        //     'message' => 'Form created'
+        // ]);
     }
 
     /**
