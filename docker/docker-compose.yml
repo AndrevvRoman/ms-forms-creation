@@ -36,3 +36,21 @@ services:
     depends_on: 
       - php_forms_creation
       - mysql_forms_creation
+  mercure_forms_creation:
+    container_name: mercure_forms_creation
+    image: dunglas/mercure:latest
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ":80"
+      MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      ALLOW_ANONYMOUS: 1
+      CORS_ALLOWED_ORIGINS: "*"
+      PUBLISH_ALLOWED_ORIGINS: "*"
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins *
+        anonymous
+    ports:
+    - "10000:80"
+    expose:
+    - "80"
