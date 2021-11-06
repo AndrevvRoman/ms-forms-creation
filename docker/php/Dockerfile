@@ -8,6 +8,13 @@ RUN apt install -y \
     vim \
     curl \
     zip \
+    librabbitmq-dev \
+    libssh-dev \
+    && docker-php-ext-install \
+    bcmath \
+    sockets \
+    && pecl install amqp \
+    && docker-php-ext-enable amqp \
     && docker-php-ext-configure zip \
     && docker-php-ext-install zip \
     && docker-php-ext-install sysvsem \
@@ -26,5 +33,3 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 RUN curl -sS https://get.symfony.com/cli/installer | bash
 RUN mv /root/.symfony/bin/symfony /usr/local/bin/symfony
-# RUN git config --global user.email "andrevvroman@gmail.com"
-# RUN git config --global user.name "AndrevvRoman"
