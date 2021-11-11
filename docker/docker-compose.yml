@@ -14,6 +14,19 @@ services:
         - '4306:3306'
       volumes:
         - ./mysql:/var/lib/mysql
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.8-management-alpine
+    environment:
+        - RABBITMQ_DEFAULT_USER=guest
+        - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+        # AMQP protocol port
+        - '5672:5672'
+        # HTTP management UI
+        - '15672:15672'
+    depends_on: 
+      - mysql_forms_creation
   php_forms_creation:
     container_name: php_forms_creation
     build: 
@@ -23,6 +36,18 @@ services:
     volumes: 
       - ../app:/var/www/php_forms_creation
     depends_on: 
+      - rabbitmq
+      - mysql_forms_creation
+  php_forms_creation_consumer:
+    container_name: php_forms_creation_consumer
+    build: 
+      context: ./php
+    volumes: 
+      - ../app:/var/www/php_forms_creation
+    restart: on-failure
+    command: [ "php", "bin/console", "messenger:consume", "async", "-vv" ]
+    depends_on: 
+      - rabbitmq
       - mysql_forms_creation
   nginx_froms_creation:
     container_name: nginx_froms_creation
@@ -34,8 +59,8 @@ services:
       - ./logs/nginx:/var/log/nginx
       - ./ngnix/default.conf:/etc/nginx/conf.d/default.conf
     depends_on: 
+      - php_forms_creation_consumer
       - php_forms_creation
-      - mysql_forms_creation
   mercure_forms_creation:
     container_name: mercure_forms_creation
     image: dunglas/mercure:latest
@@ -54,14 +79,6 @@ services:
     - "10000:80"
     expose:
     - "80"
-  rabbitmq3:
-    container_name: "rabbitmq"
-    image: rabbitmq:3.8-management-alpine
-    environment:
-        - RABBITMQ_DEFAULT_USER=guest
-        - RABBITMQ_DEFAULT_PASS=guest
-    ports:
-        # AMQP protocol port
-        - '5672:5672'
-        # HTTP management UI
-        - '15672:15672'
+    depends_on: 
+      - php_forms_creation_consumer
+      - php_forms_creation
