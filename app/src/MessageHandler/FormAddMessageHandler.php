@@ -4,23 +4,29 @@ namespace App\MessageHandler;
 
 use App\Entity\Form;
 use App\Message\FormAddMessage;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Mercure\HubInterface;
-use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Mercure\Update;
 
 
 final class FormAddMessageHandler implements MessageHandlerInterface
 {
-    public function __invoke(FormAddMessage $formAdd, HubInterface $hub, ObjectManager $manager)
+    private HubInterface $hub;
+    private EntityManagerInterface $manager;
+    public function __construct(EntityManagerInterface $entityManager, HubInterface $hub)
     {
-        echo 'Creating form now ....\n';
+        $this->manager = $entityManager;
+        $this->hub = $hub;
+    }
+    public function __invoke(FormAddMessage $formAdd)
+    {
+        echo 'Creating form now ....';
 
         $newForm = new Form();
         $newForm->setName($formAdd->getName())->setTitle($formAdd->getTitle())->setUserId($formAdd->getUserId());
-        echo $newForm;
-        $manager->persist($newForm);
-        $manager->flush();
+        $this->manager->persist($newForm);
+        $this->manager->flush();
 
         $update = new Update(
             'subscribe_add_form',
@@ -30,6 +36,6 @@ final class FormAddMessageHandler implements MessageHandlerInterface
                 'id' => $newForm->getId()
             ])
         );
-        $hub->publish($update);
+        $this->hub->publish($update);
     }
 }
