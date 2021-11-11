@@ -103,22 +103,6 @@ class FormsController extends AbstractController
     }
 
     /**
-     * @Route("/rabbit/forms/add", name="form_add_rabbit", methods={"POST"})
-     * @Security("is_granted('ROLE_USER')")
-     * @return HttpResponse
-     */
-    public function add_forms_rabbit(Request $r, HubInterface $hub, MessageBusInterface $bus): Response
-    {
-        $data = json_decode($r->getContent(), true);
-        $name = $data['name'];
-        $title = $data['title'];
-        $userId = $this->getUser()->getId();
-        $bus->dispatch(new FormAddMessage($name, $title, $userId));
-
-        return new Response('You form has been placed');
-    }
-
-    /**
      * @Route("/forms/add", name="form_add", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return HttpResponse
