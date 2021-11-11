@@ -12,3 +12,5 @@ framework:
         routing:
             # Route your messages to the transports
             App\Message\FormAddMessage: async
+            App\Message\FormChangeMessage: async
+            App\Message\FormDeleteMessage: async
