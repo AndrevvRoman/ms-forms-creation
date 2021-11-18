@@ -18,7 +18,7 @@ use App\Entity\Form;
 class FieldsController extends AbstractController
 {
     /**
-     * @Route("/fields/all", name="fields", methods={"GET"})
+     * @Route("/fields/all", name="fields", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -34,7 +34,7 @@ class FieldsController extends AbstractController
     }
 
     /**
-     * @Route("/fields/find", name="field", methods={"GET"})
+     * @Route("/fields/find", name="field", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */

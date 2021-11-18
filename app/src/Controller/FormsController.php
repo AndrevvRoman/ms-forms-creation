@@ -17,7 +17,7 @@ use App\Service\NormalizeService;
 class FormsController extends AbstractController
 {
     /**
-     * @Route("/forms/all", name="forms_all", methods={"GET"})
+     * @Route("/forms/all", name="forms_all", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -43,7 +43,7 @@ class FormsController extends AbstractController
     }
 
     /**
-     * @Route("/forms/find", name="form_find", methods={"GET"})
+     * @Route("/forms/find", name="form_find", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
@@ -78,7 +78,7 @@ class FormsController extends AbstractController
     }
 
     /**
-     * @Route("/forms/find/fields", name="form_find_fields", methods={"GET"})
+     * @Route("/forms/find/fields", name="form_find_fields", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      * @return JsonResponse
      */
