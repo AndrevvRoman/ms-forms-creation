@@ -109,6 +109,12 @@ class Field
      */
     private $possbleValues = [];
 
+    /**
+     * @ORM\Column(type="integer")
+     * @Groups({"main"})
+     */
+    private $priority;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -202,6 +208,18 @@ class Field
     public function setPossbleValues(?array $possbleValues): self
     {
         $this->possbleValues = $possbleValues;
+
+        return $this;
+    }
+
+    public function getPriority(): ?int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): self
+    {
+        $this->priority = $priority;
 
         return $this;
     }

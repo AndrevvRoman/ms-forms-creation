@@ -73,10 +73,11 @@ class FieldsController extends AbstractController
         $inputType = $data['inputType'];
         $parentId = $data['idForm'];
         $possbleValues = $data['possbleValues'] ?? array();
+        $priority = $data['priority'];
 
         $newField = new Field();
         $newField->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder);
-        $newField->setInputType($inputType)->setIsActive($isActive)->setPossbleValues($possbleValues);
+        $newField->setInputType($inputType)->setIsActive($isActive)->setPossbleValues($possbleValues)->setPriority($priority);
         $manager = $this->getDoctrine()->getManager();
 
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
@@ -156,6 +157,7 @@ class FieldsController extends AbstractController
         $inputType = $data['inputType'];
         $parentId = $data['idForm'];
         $possbleValues = $data['possbleValues'];
+        $priority = $data['priority'];
 
         $manager = $this->getDoctrine()->getManager();
         $parentForm = $manager->getRepository(Form::class)->find($parentId);
@@ -167,7 +169,7 @@ class FieldsController extends AbstractController
             ]);
         }
         $field->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType);
-        $field->setIdFormFK($parentForm)->setIsActive($isActive)->setPossbleValues($possbleValues);
+        $field->setIdFormFK($parentForm)->setIsActive($isActive)->setPossbleValues($possbleValues)->setPriority($priority);
         $manager->flush();
 
         return $this->json([
