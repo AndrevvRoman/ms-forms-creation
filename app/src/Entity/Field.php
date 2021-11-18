@@ -18,7 +18,7 @@ class Field
     private const INPUT_TYPE_IMAGE = "image";
     private const INPUT_TYPE_RADIO = "radio";
     private const INPUT_TYPE_TEXT = "text";
-
+    
     //since HTML 5
     private const INPUT_TYPE_COLOR = "color";
     private const INPUT_TYPE_DATE = "date";
@@ -32,6 +32,9 @@ class Field
     private const INPUT_TYPE_RANGE = "range";
     private const INPUT_TYPE_TEL = "tel";
     private const INPUT_TYPE_URL = "url";
+    
+    //Out of HTML
+    private const INPUT_TYPE_TEXTAREA = "textarea";
 
     const inputTypes = array(
         Field::INPUT_TYPE_DEFAULT,
@@ -52,7 +55,8 @@ class Field
         Field::INPUT_TYPE_NUMBER ,
         Field::INPUT_TYPE_RANGE ,
         Field::INPUT_TYPE_TEL ,
-        Field::INPUT_TYPE_URL ,        
+        Field::INPUT_TYPE_URL ,    
+        Field::INPUT_TYPE_TEXTAREA,    
     );
 
     /**
@@ -65,6 +69,7 @@ class Field
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"main"})
      */
     private $isRequire;
 
@@ -94,6 +99,7 @@ class Field
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"main"})
      */
     private $isActive;
 
