@@ -35,6 +35,8 @@ class Field
     
     //Out of HTML
     private const INPUT_TYPE_TEXTAREA = "textarea";
+    private const INPUT_TYPE_RATING = "rating";
+
 
     const inputTypes = array(
         Field::INPUT_TYPE_DEFAULT,
@@ -56,7 +58,8 @@ class Field
         Field::INPUT_TYPE_RANGE ,
         Field::INPUT_TYPE_TEL ,
         Field::INPUT_TYPE_URL ,    
-        Field::INPUT_TYPE_TEXTAREA,    
+        Field::INPUT_TYPE_TEXTAREA,
+        Field::INPUT_TYPE_RATING,
     );
 
     /**
@@ -88,6 +91,7 @@ class Field
     /**
      * @ORM\ManyToOne(targetEntity=Form::class, inversedBy="fields")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"main"})
      */
     private $idFormFK;
 
