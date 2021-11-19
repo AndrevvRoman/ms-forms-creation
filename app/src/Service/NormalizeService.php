@@ -10,12 +10,6 @@ use Symfony\Component\Serializer\Serializer;
 
 class NormalizeService
 {
-    private $datetimeFormat;
-
-    public function __construct()
-    {
-
-    }
 
     public function normalizeByGroup($object, $groups = ['groups' => 'main']) {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
