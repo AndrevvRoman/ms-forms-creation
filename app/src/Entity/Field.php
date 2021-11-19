@@ -160,9 +160,9 @@ class Field
         return $this;
     }
 
-    public function getIdFormFK(): ?Form
+    public function getIdFormFK(): ?int
     {
-        return $this->idFormFK;
+        return $this->idFormFK->getId();
     }
 
     public function setIdFormFK(?Form $idFormFK): self
