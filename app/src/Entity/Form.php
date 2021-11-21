@@ -38,7 +38,7 @@ class Form
     private $title;
 
     /**
-     * @ORM\OneToMany(targetEntity=Field::class, mappedBy="idFormFK", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Field::class, mappedBy="form", orphanRemoval=true)
      * @Groups({"additional"})
      */
     private $fields;
@@ -93,7 +93,7 @@ class Form
     {
         if (!$this->fields->contains($field)) {
             $this->fields[] = $field;
-            $field->setIdFormFK($this);
+            $field->setForm($this);
         }
 
         return $this;
@@ -103,8 +103,8 @@ class Form
     {
         if ($this->fields->removeElement($field)) {
             // set the owning side to null (unless already changed)
-            if ($field->getIdFormFK() === $this) {
-                $field->setIdFormFK(null);
+            if ($field->getForm() === $this) {
+                $field->setForm(null);
             }
         }
 

@@ -88,7 +88,7 @@ class FieldsController extends AbstractController
                 'message' => 'Parent from not founded'
             ]);
         }
-        $newField->setIdFormFK($parentForm);
+        $newField->setForm($parentForm);
 
         $manager->persist($newField);
         $manager->flush();
@@ -169,7 +169,7 @@ class FieldsController extends AbstractController
             ]);
         }
         $field->setIsRequire($isReqire)->setTitle($title)->setPlaceHolder($placeHolder)->setInputType($inputType);
-        $field->setIdFormFK($parentForm)->setIsActive($isActive)->setPossbleValues($possbleValues)->setPriority($priority);
+        $field->setForm($parentForm)->setIsActive($isActive)->setPossbleValues($possbleValues)->setPriority($priority);
         $manager->flush();
 
         return $this->json([

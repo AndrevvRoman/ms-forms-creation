@@ -91,9 +91,13 @@ class Field
     /**
      * @ORM\ManyToOne(targetEntity=Form::class, inversedBy="fields")
      * @ORM\JoinColumn(nullable=false)
+     */
+    private $form;
+
+    /**
      * @Groups({"main"})
      */
-    private $idFormFK;
+    private $idForm;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -160,16 +164,21 @@ class Field
         return $this;
     }
 
-    public function getIdFormFK(): ?int
+    public function getForm(): ?Form
     {
-        return $this->idFormFK->getId();
+        return $this->form;
     }
 
-    public function setIdFormFK(?Form $idFormFK): self
+    public function setForm(?Form $form): self
     {
-        $this->idFormFK = $idFormFK;
-
+        $this->form = $form;
+        $this->idForm = $form->getId();
         return $this;
+    }
+
+    public function getIdForm() : ?int
+    {
+        return $this->idForm;
     }
 
     public function validateInputType($inputType)
@@ -227,4 +236,6 @@ class Field
 
         return $this;
     }
+
+
 }
