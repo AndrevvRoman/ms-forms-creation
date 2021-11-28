@@ -49,7 +49,7 @@ class ResponseController extends AbstractController
     }
 
     /**
-     * @Route("/response/get", name="response_get", methods={"GET"})
+     * @Route("/response/get", name="response_get", methods={"POST"})
      * @Security("is_granted('ROLE_USER')")
      */
     public function get_response(Request $r): Response
