@@ -71,7 +71,7 @@ class FieldsController extends AbstractController
         $title = $data['title'];
         $placeHolder = $data['placeHolder'];
         $inputType = $data['inputType'];
-        $parentId = $data['idForm'];
+        $parentId = $data['formId'];
         $possbleValues = $data['possbleValues'] ?? array();
         $priority = $data['priority'];
 
@@ -155,7 +155,7 @@ class FieldsController extends AbstractController
         $title = $data['title'];
         $placeHolder = $data['placeHolder'];
         $inputType = $data['inputType'];
-        $parentId = $data['idForm'];
+        $parentId = $data['formId'];
         $possbleValues = $data['possbleValues'];
         $priority = $data['priority'];
 
