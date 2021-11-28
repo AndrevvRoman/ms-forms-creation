@@ -95,10 +95,6 @@ class Field
     private $form;
 
     /**
-     */
-    private $idForm;
-
-    /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"main"})
      */
@@ -171,13 +167,7 @@ class Field
     public function setForm(?Form $form): self
     {
         $this->form = $form;
-        $this->idForm = $form->getId();
         return $this;
-    }
-
-    public function getIdForm() : ?int
-    {
-        return $this->idForm;
     }
 
     public function validateInputType($inputType)
