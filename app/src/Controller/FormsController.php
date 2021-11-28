@@ -24,7 +24,7 @@ class FormsController extends AbstractController
     public function forms(Request $r): Response
     {
         $data = json_decode($r->getContent(), true);
-        $isFieldsReqire = $data['all'] ?? false;
+        $isFieldsReqire = $data['includeFields'] ?? false;
         $em = $this->getDoctrine()->getManager();
         $forms = $em->getRepository(Form::class)->findAll();
         if (!$isFieldsReqire)
@@ -50,7 +50,7 @@ class FormsController extends AbstractController
     public function form(Request $r): Response
     {
         $data = json_decode($r->getContent(), true);
-        $isFieldsReqire = $data['all'] ?? false;
+        $isFieldsReqire = $data['includeFields'] ?? false;
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
         $form = $em->getRepository(Form::class)->find($id);
