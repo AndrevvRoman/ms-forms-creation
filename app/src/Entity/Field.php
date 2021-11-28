@@ -95,7 +95,6 @@ class Field
     private $form;
 
     /**
-     * @Groups({"main"})
      */
     private $idForm;
 
